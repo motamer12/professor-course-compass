@@ -18,6 +18,10 @@ interface ChangePasswordModalProps {
   onClose: () => void;
 }
 
+// Password validation regex: at least one uppercase, one lowercase, one digit, 
+// one special character (@$!%*?&), minimum 6 characters
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+
 const ChangePasswordModal = ({
   isOpen,
   onClose,
@@ -43,6 +47,23 @@ const ChangePasswordModal = ({
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
+    
+    // Validate password as the user types
+    if (name === "newPassword" && value) {
+      if (!passwordRegex.test(value)) {
+        setErrors((prev) => ({ 
+          ...prev, 
+          newPassword: "Password must contain at least one uppercase letter, one lowercase letter, one digit, one special character (@$!%*?&), and be at least 6 characters long"
+        }));
+      }
+    }
+    
+    // Check if passwords match as the user types in confirm password
+    if (name === "confirmPassword" && value) {
+      if (value !== formData.newPassword) {
+        setErrors((prev) => ({ ...prev, confirmPassword: "Passwords do not match" }));
+      }
+    }
   };
 
   const validateForm = () => {
@@ -61,8 +82,8 @@ const ChangePasswordModal = ({
     if (!formData.newPassword) {
       newErrors.newPassword = "New password is required";
       isValid = false;
-    } else if (formData.newPassword.length < 6) {
-      newErrors.newPassword = "Password must be at least 6 characters";
+    } else if (!passwordRegex.test(formData.newPassword)) {
+      newErrors.newPassword = "Password must contain at least one uppercase letter, one lowercase letter, one digit, one special character (@$!%*?&), and be at least 6 characters long";
       isValid = false;
     }
 
@@ -144,6 +165,16 @@ const ChangePasswordModal = ({
               {errors.newPassword && (
                 <p className="text-destructive text-sm">{errors.newPassword}</p>
               )}
+              <div className="text-sm text-medium-gray">
+                Password must contain:
+                <ul className="list-disc pl-5 mt-1">
+                  <li className={formData.newPassword.match(/[A-Z]/) ? "text-secondary" : ""}>At least one uppercase letter</li>
+                  <li className={formData.newPassword.match(/[a-z]/) ? "text-secondary" : ""}>At least one lowercase letter</li>
+                  <li className={formData.newPassword.match(/\d/) ? "text-secondary" : ""}>At least one digit</li>
+                  <li className={formData.newPassword.match(/[@$!%*?&]/) ? "text-secondary" : ""}>At least one special character (@$!%*?&)</li>
+                  <li className={formData.newPassword.length >= 6 ? "text-secondary" : ""}>Minimum 6 characters</li>
+                </ul>
+              </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
