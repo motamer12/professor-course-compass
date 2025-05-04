@@ -8,17 +8,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Download } from "lucide-react";
+import { LectureData } from "@/components/modals/LectureFormModal";
 
 interface LectureDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  lecture: {
-    id: number;
-    title: string;
-    date: string;
-    content: string;
-  };
+  lecture: LectureData;
 }
 
 const LectureDetailsModal = ({
@@ -26,32 +22,46 @@ const LectureDetailsModal = ({
   onClose,
   lecture,
 }: LectureDetailsModalProps) => {
-  const formattedDate = new Date(lecture.date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+  const handleDownload = () => {
+    // In a real application, this would trigger a download
+    if (lecture.attachmentURL) {
+      const link = document.createElement('a');
+      link.href = lecture.attachmentURL;
+      link.download = `${lecture.title}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg animate-fade-in">
+      <DialogContent className="sm:max-w-4xl animate-fade-in max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>{lecture.title}</DialogTitle>
-          <DialogDescription>
-            {formattedDate}
+          <DialogDescription className="flex justify-between items-center">
+            <span>Lecture Document</span>
+            {lecture.attachmentURL && (
+              <Button variant="outline" size="sm" onClick={handleDownload} className="flex items-center gap-1">
+                <Download size={16} />
+                <span>Download</span>
+              </Button>
+            )}
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="max-h-72">
-          <div className="space-y-4 p-2">
-            <div className="whitespace-pre-wrap">
-              {lecture.content}
+        <div className="h-[60vh] overflow-hidden rounded border">
+          {lecture.attachmentURL ? (
+            <iframe 
+              src={lecture.attachmentURL} 
+              className="w-full h-full" 
+              title={lecture.title}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full bg-muted">
+              <p className="text-muted-foreground">No PDF attachment available</p>
             </div>
-            <div className="pt-4 border-t">
-              <h4 className="font-medium mb-2">Attachments</h4>
-              <p className="text-medium-gray italic">No attachments available</p>
-            </div>
-          </div>
-        </ScrollArea>
+          )}
+        </div>
         <DialogFooter>
           <Button onClick={onClose}>Close</Button>
         </DialogFooter>

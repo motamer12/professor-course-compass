@@ -4,7 +4,6 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
   Home, 
-  BookOpen, 
   UserCircle, 
   LogOut, 
   Menu, 
@@ -40,8 +39,7 @@ const Sidebar = () => {
   };
 
   const navItems = [
-    { name: "Home", path: "/", icon: Home },
-    { name: "Courses", path: "/courses", icon: BookOpen },
+    { name: "Home", path: "/home", icon: Home },
     { name: "Profile", path: "/profile", icon: UserCircle },
   ];
 

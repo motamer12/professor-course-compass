@@ -23,28 +23,19 @@ interface LecturesTableProps {
 const LecturesTable = ({ lectures, onEdit, onDelete, onView }: LecturesTableProps) => {
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
   return (
     <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Lecture Title</TableHead>
-            <TableHead>Date</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {lectures.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={3} className="text-center text-medium-gray py-8">
+              <TableCell colSpan={2} className="text-center text-medium-gray py-8">
                 No lectures available
               </TableCell>
             </TableRow>
@@ -61,7 +52,6 @@ const LecturesTable = ({ lectures, onEdit, onDelete, onView }: LecturesTableProp
                 )}
               >
                 <TableCell className="font-medium">{lecture.title}</TableCell>
-                <TableCell>{formatDate(lecture.date)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-2">
                     <Button 
@@ -69,6 +59,7 @@ const LecturesTable = ({ lectures, onEdit, onDelete, onView }: LecturesTableProp
                       size="icon" 
                       onClick={() => onView(lecture)}
                       className="hover:bg-primary/10 hover:text-primary"
+                      title="View Lecture"
                     >
                       <Eye size={18} />
                     </Button>
@@ -77,6 +68,7 @@ const LecturesTable = ({ lectures, onEdit, onDelete, onView }: LecturesTableProp
                       size="icon" 
                       onClick={() => onEdit(lecture)}
                       className="hover:bg-primary/10 hover:text-primary" 
+                      title="Edit Lecture"
                     >
                       <Pencil size={18} />
                     </Button>
@@ -85,6 +77,7 @@ const LecturesTable = ({ lectures, onEdit, onDelete, onView }: LecturesTableProp
                       size="icon" 
                       onClick={() => onDelete(lecture.id || 0)}
                       className="hover:bg-destructive/10 hover:text-destructive" 
+                      title="Delete Lecture"
                     >
                       <Trash2 size={18} />
                     </Button>
