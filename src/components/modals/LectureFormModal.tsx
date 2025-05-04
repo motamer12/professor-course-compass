@@ -22,7 +22,7 @@ interface LectureFormModalProps {
 }
 
 export interface LectureData {
-  id?: number;
+  id: number; // Changed from optional to required
   title: string;
   date: string;
   content: string;
@@ -38,6 +38,7 @@ const LectureFormModal = ({
 }: LectureFormModalProps) => {
   const [formData, setFormData] = useState<LectureData>(
     initialData || {
+      id: 0, // Provide a default value since it's now required
       title: "",
       date: new Date().toISOString().split("T")[0],
       content: "",

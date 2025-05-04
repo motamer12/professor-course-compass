@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import React from "react"; // Add React import for CSSProperties
 
 interface CourseCardProps {
   id: number;
@@ -10,9 +11,10 @@ interface CourseCardProps {
   totalHours: number;
   imageUrl: string;
   className?: string;
+  style?: React.CSSProperties; // Add style prop
 }
 
-const CourseCard = ({ id, title, totalHours, imageUrl, className }: CourseCardProps) => {
+const CourseCard = ({ id, title, totalHours, imageUrl, className, style }: CourseCardProps) => {
   const navigate = useNavigate();
 
   const handleViewCourse = () => {
@@ -20,7 +22,10 @@ const CourseCard = ({ id, title, totalHours, imageUrl, className }: CourseCardPr
   };
 
   return (
-    <Card className={cn("w-full max-w-md mx-auto overflow-hidden card-shadow animate-slide-in", className)}>
+    <Card 
+      className={cn("w-full max-w-md mx-auto overflow-hidden card-shadow animate-slide-in", className)} 
+      style={style} // Add style prop to the Card component
+    >
       <div className="h-48 overflow-hidden">
         <img 
           src={imageUrl} 

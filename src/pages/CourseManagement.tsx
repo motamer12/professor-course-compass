@@ -63,6 +63,7 @@ const CourseManagement = () => {
 
   // Lectures handlers
   const handleAddLecture = () => {
+    // When adding a new lecture, set currentLecture to null but with a default ID of 0
     setCurrentLecture(null);
     setIsLectureFormOpen(true);
   };
@@ -108,10 +109,10 @@ const CourseManagement = () => {
         duration: 3000,
       });
     } else {
-      // Add new lecture
+      // Add new lecture with a new ID
       const newLecture = {
         ...lectureData,
-        id: Math.max(0, ...lectures.map((l) => l.id || 0)) + 1,
+        id: Math.max(0, ...lectures.map((l) => l.id)) + 1,
       };
       setLectures([...lectures, newLecture]);
       toast({
