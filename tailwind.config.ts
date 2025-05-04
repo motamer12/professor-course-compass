@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -25,20 +26,20 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
+					DEFAULT: '#4A90E2', // Soft Blue
 					foreground: 'hsl(var(--primary-foreground))'
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
+					DEFAULT: '#50C878', // Emerald Green
 					foreground: 'hsl(var(--secondary-foreground))'
 				},
 				destructive: {
-					DEFAULT: 'hsl(var(--destructive))',
+					DEFAULT: '#E74C3C', // Soft Red
 					foreground: 'hsl(var(--destructive-foreground))'
 				},
 				muted: {
 					DEFAULT: 'hsl(var(--muted))',
-					foreground: 'hsl(var(--muted-foreground))'
+					foreground: '#666666' // Medium Gray
 				},
 				accent: {
 					DEFAULT: 'hsl(var(--accent))',
@@ -63,6 +64,13 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			backgroundColor: {
+				'light-gray': '#F5F7FA', // Background
+			},
+			textColor: {
+				'dark-gray': '#333333', // Primary Text
+				'medium-gray': '#666666', // Secondary Text
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
@@ -84,11 +92,31 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'slide-in-right': {
+					'0%': { transform: 'translateX(100%)' },
+					'100%': { transform: 'translateX(0)' }
+				},
+				'slide-in': {
+					'0%': { transform: 'translateY(20px)', opacity: '0' },
+					'100%': { transform: 'translateY(0)', opacity: '1' }
+				},
+				'fade-in': {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
+				},
+				'scale-up': {
+					'0%': { transform: 'scale(1)' },
+					'100%': { transform: 'scale(1.1)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'slide-in-right': 'slide-in-right 0.5s ease-out',
+				'slide-in': 'slide-in 0.5s ease-out',
+				'fade-in': 'fade-in 0.3s ease-out',
+				'scale-up': 'scale-up 0.2s ease-out'
 			}
 		}
 	},
