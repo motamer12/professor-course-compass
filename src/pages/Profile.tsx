@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,6 @@ const Profile = () => {
     <MainLayout>
       <div className="container mx-auto px-4 py-8 max-w-3xl animate-fade-in">
         <h1 className="text-2xl font-bold text-dark-gray mb-8">Profile</h1>
-        
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>Professor Information</CardTitle>
@@ -40,7 +38,6 @@ const Profile = () => {
             </div>
           </CardContent>
         </Card>
-        
         <Card>
           <CardHeader>
             <CardTitle>Security</CardTitle>
@@ -58,7 +55,6 @@ const Profile = () => {
             </div>
           </CardContent>
         </Card>
-        
         <ChangePasswordModal
           isOpen={isChangePasswordModalOpen}
           onClose={() => setIsChangePasswordModalOpen(false)}

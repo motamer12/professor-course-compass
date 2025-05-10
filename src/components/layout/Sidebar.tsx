@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
+import { logout } from "@/lib/auth";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -23,24 +23,12 @@ const Sidebar = () => {
   };
 
   const handleLogout = () => {
-    // Remove JWT token from localStorage
-    localStorage.removeItem("professorToken");
-    
-    // Show success toast
-    toast({
-      title: "Logged out successfully",
-      className: "bg-secondary text-white animate-slide-in-right",
-      duration: 3000,
-    });
-    
-    // In a real app, we would redirect to login page
-    // For now, we'll just redirect to home
-    window.location.href = "/";
+    logout(() => {});
   };
 
   const navItems = [
-    { name: "Home", path: "/home", icon: Home },
-    { name: "Profile", path: "/profile", icon: UserCircle },
+    { name: "Home", path: "/eduverse/professor/home", icon: Home },
+    { name: "Profile", path: "/eduverse/professor/profile", icon: UserCircle },
   ];
 
   return (

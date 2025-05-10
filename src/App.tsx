@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,51 +8,44 @@ import Home from "./pages/Home";
 import CourseManagement from "./pages/CourseManagement";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
-import { isAuthenticated } from "./services/authService";
+import { AuthProvider } from "./lib/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-}
-
-const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  // In a real app, check if user is authenticated
-  if (!isAuthenticated()) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return <>{children}</>;
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Redirect /eduverse/professor to /eduverse/professor/home */}
+              <Route path="/eduverse/professor" element={<Navigate to="/eduverse/professor/home" replace />} />
+              <Route path="/eduverse/professor/home" element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              } />
+              <Route path="/eduverse/professor/courses/:courseId" element={
+                <ProtectedRoute>
+                  <CourseManagement />
+                </ProtectedRoute>
+              } />
+              <Route path="/eduverse/professor/profile" element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
 };
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/home" element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          } />
-          <Route path="/courses/:courseId" element={
-            <ProtectedRoute>
-              <CourseManagement />
-            </ProtectedRoute>
-          } />
-          <Route path="/profile" element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          } />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
 
 export default App;

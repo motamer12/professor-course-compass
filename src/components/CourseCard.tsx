@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +17,7 @@ const CourseCard = ({ id, title, totalHours, imageUrl, className, style }: Cours
   const navigate = useNavigate();
 
   const handleViewCourse = () => {
-    navigate(`/courses/${id}`);
+    navigate(`/eduverse/professor/courses/${id}`);
   };
 
   return (

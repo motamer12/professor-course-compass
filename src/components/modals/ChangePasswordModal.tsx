@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Dialog,
@@ -12,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { api, logout } from "@/lib/auth";
 
 interface ChangePasswordModalProps {
   isOpen: boolean;
@@ -19,19 +19,21 @@ interface ChangePasswordModalProps {
 }
 
 // Password validation regex: at least one uppercase, one lowercase, one digit, 
-// one special character (@$!%*?&), minimum 6 characters
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+// one special character (@$!%*?&), minimum 8 characters
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 const ChangePasswordModal = ({
   isOpen,
   onClose,
 }: ChangePasswordModalProps) => {
   const [formData, setFormData] = useState({
+    email: "",
     oldPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({
+    email: "",
     oldPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -39,26 +41,28 @@ const ChangePasswordModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  // Try to prefill email from localStorage/profile if available
+  useState(() => {
+    const profile = JSON.parse(localStorage.getItem("profile") || "null");
+    if (profile && profile.email) {
+      setFormData((prev) => ({ ...prev, email: profile.email }));
+    }
+  });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    
-    // Clear error when typing
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-    
-    // Validate password as the user types
     if (name === "newPassword" && value) {
       if (!passwordRegex.test(value)) {
         setErrors((prev) => ({ 
           ...prev, 
-          newPassword: "Password must contain at least one uppercase letter, one lowercase letter, one digit, one special character (@$!%*?&), and be at least 6 characters long"
+          newPassword: "Password must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, one digit, and one special character (@$!%*?&)"
         }));
       }
     }
-    
-    // Check if passwords match as the user types in confirm password
     if (name === "confirmPassword" && value) {
       if (value !== formData.newPassword) {
         setErrors((prev) => ({ ...prev, confirmPassword: "Passwords do not match" }));
@@ -68,25 +72,27 @@ const ChangePasswordModal = ({
 
   const validateForm = () => {
     const newErrors = {
+      email: "",
       oldPassword: "",
       newPassword: "",
       confirmPassword: "",
     };
     let isValid = true;
-
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    }
     if (!formData.oldPassword) {
       newErrors.oldPassword = "Current password is required";
       isValid = false;
     }
-
     if (!formData.newPassword) {
       newErrors.newPassword = "New password is required";
       isValid = false;
     } else if (!passwordRegex.test(formData.newPassword)) {
-      newErrors.newPassword = "Password must contain at least one uppercase letter, one lowercase letter, one digit, one special character (@$!%*?&), and be at least 6 characters long";
+      newErrors.newPassword = "Password must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, one digit, and one special character (@$!%*?&)";
       isValid = false;
     }
-
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password";
       isValid = false;
@@ -94,39 +100,40 @@ const ChangePasswordModal = ({
       newErrors.confirmPassword = "Passwords do not match";
       isValid = false;
     }
-
     setErrors(newErrors);
     return isValid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!validateForm()) return;
     setIsLoading(true);
-
-    // Mock API call - in a real app, you would call an actual API
-    setTimeout(() => {
+    try {
+      const res = await api.post("/api/auth/changePassword", {
+        email: formData.email,
+        password: formData.oldPassword,
+        newPassword: formData.newPassword,
+      });
+      toast({
+        title: "Password changed successfully. Please log in again.",
+        className: "bg-secondary text-white animate-slide-in-right",
+        duration: 3000,
+      });
       setIsLoading(false);
-      
-      // For demo, always succeed if passwords match
-      if (formData.newPassword === formData.confirmPassword) {
-        toast({
-          title: "Password changed successfully",
-          className: "bg-secondary text-white animate-slide-in-right",
-          duration: 3000,
-        });
-        onClose();
-      } else {
-        setErrors({
-          ...errors,
-          confirmPassword: "Passwords do not match",
-        });
-      }
-    }, 1000);
+      onClose();
+      logout(() => {}); // Log out user since token is invalidated
+    } catch (err: any) {
+      setIsLoading(false);
+      toast({
+        title: "Password change failed",
+        description:
+          err.response?.data?.message ||
+          err.response?.data ||
+          err.message ||
+          "Failed to change password.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -141,6 +148,20 @@ const ChangePasswordModal = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4">
             <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                autoComplete="email"
+              />
+              {errors.email && (
+                <p className="text-destructive text-sm">{errors.email}</p>
+              )}
+            </div>
+            <div className="grid gap-2">
               <Label htmlFor="oldPassword">Current Password</Label>
               <Input
                 id="oldPassword"
@@ -148,6 +169,7 @@ const ChangePasswordModal = ({
                 type="password"
                 value={formData.oldPassword}
                 onChange={handleChange}
+                autoComplete="current-password"
               />
               {errors.oldPassword && (
                 <p className="text-destructive text-sm">{errors.oldPassword}</p>
@@ -161,6 +183,7 @@ const ChangePasswordModal = ({
                 type="password"
                 value={formData.newPassword}
                 onChange={handleChange}
+                autoComplete="new-password"
               />
               {errors.newPassword && (
                 <p className="text-destructive text-sm">{errors.newPassword}</p>
@@ -172,7 +195,7 @@ const ChangePasswordModal = ({
                   <li className={formData.newPassword.match(/[a-z]/) ? "text-secondary" : ""}>At least one lowercase letter</li>
                   <li className={formData.newPassword.match(/\d/) ? "text-secondary" : ""}>At least one digit</li>
                   <li className={formData.newPassword.match(/[@$!%*?&]/) ? "text-secondary" : ""}>At least one special character (@$!%*?&)</li>
-                  <li className={formData.newPassword.length >= 6 ? "text-secondary" : ""}>Minimum 6 characters</li>
+                  <li className={formData.newPassword.length >= 8 ? "text-secondary" : ""}>Minimum 8 characters</li>
                 </ul>
               </div>
             </div>
@@ -184,6 +207,7 @@ const ChangePasswordModal = ({
                 type="password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
+                autoComplete="new-password"
               />
               {errors.confirmPassword && (
                 <p className="text-destructive text-sm">{errors.confirmPassword}</p>
