@@ -25,6 +25,8 @@ export interface LectureData {
   id: number;
   title: string;
   courseId: number;
+  date?: string;
+  content?: string;
   attachment?: File | null;
   attachmentURL?: string;
 }
@@ -160,3 +162,4 @@ const LectureFormModal = ({
 };
 
 export default LectureFormModal;
+

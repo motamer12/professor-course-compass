@@ -26,6 +26,7 @@ export interface AssignmentData {
   title: string;
   deadline: string;
   courseId: number;
+  description?: string;
   attachment?: File | null;
   attachmentURL?: string;
 }
@@ -172,3 +173,4 @@ const AssignmentFormModal = ({
 };
 
 export default AssignmentFormModal;
+
